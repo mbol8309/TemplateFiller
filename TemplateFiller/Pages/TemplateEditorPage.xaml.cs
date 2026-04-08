@@ -15,6 +15,7 @@ using TemplateFiller.Models;
 using TemplateFiller.Services;
 using Windows.Foundation;
 using Windows.Storage.Pickers;
+using Windows.UI;
 
 namespace TemplateFiller.Pages;
 
@@ -173,8 +174,8 @@ public sealed partial class TemplateEditorPage : Page
             CornerRadius = new CornerRadius(3),
             Padding = new Thickness(4, 2, 4, 2),
             Tag = field.Id,
-            Cursor = InputSystemCursor.Create(InputSystemCursorShape.SizeAll),
         };
+
 
         Canvas.SetLeft(border, screenX);
         Canvas.SetTop(border, screenY);

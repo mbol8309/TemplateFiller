@@ -87,7 +87,7 @@ public sealed partial class MainPage : Page
         var deleteBtn = new Button
         {
             Content = new FontIcon { Glyph = "\uE74D", FontSize = 14 },
-            ToolTipService = { ToolTip = "Eliminar" },
+            //ToolTipService = { ToolTip = "Eliminar" },
         };
         deleteBtn.Click += (_, _) => DeleteTemplate(template.FilePath);
         buttons.Children.Add(deleteBtn);
