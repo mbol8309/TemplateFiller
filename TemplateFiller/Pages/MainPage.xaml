@@ -1,0 +1,32 @@
+<Page
+    x:Class="TemplateFiller.Pages.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:TemplateFiller.Models">
+
+    <Grid RowDefinitions="Auto,*" Padding="24">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="PDF Template Filler" Style="{StaticResource TitleTextBlockStyle}"/>
+                <TextBlock Text="Gestiona tus plantillas PDF" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1" x:Name="AddTemplateButton" Click="AddTemplateButton_Click"
+                    Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE710;" FontSize="14"/>
+                    <TextBlock Text="Nueva plantilla"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Lista de plantillas -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel x:Name="TemplatesPanel" Spacing="8">
+                <!-- Plantillas se cargan en code-behind -->
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</Page>

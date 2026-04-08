@@ -1,0 +1,115 @@
+<Page
+    x:Class="TemplateFiller.Pages.TemplateEditorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,280">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" Padding="16,12" Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" x:Name="BackButton" Click="BackButton_Click" Style="{StaticResource SubtleButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE76B;" FontSize="12"/>
+                    <TextBlock Text="Volver"/>
+                </StackPanel>
+            </Button>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock x:Name="TemplateNameText" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <Button x:Name="LoadExcelButton" Click="LoadExcelButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE8A5;" FontSize="14"/>
+                        <TextBlock Text="Cargar Excel"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <Button Grid.Column="2" x:Name="SaveButton" Click="SaveButton_Click" Style="{StaticResource AccentButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE74E;" FontSize="14"/>
+                    <TextBlock Text="Guardar"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Editor de PDF -->
+        <Grid Grid.Row="1" Grid.Column="0" x:Name="PdfEditorContainer"
+              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="PdfCanvasContainer" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <!-- Imagen del PDF -->
+                    <Image x:Name="PdfImage" Stretch="None"/>
+                    <!-- Canvas con los campos posicionables -->
+                    <Canvas x:Name="FieldsCanvas"
+                            PointerPressed="FieldsCanvas_PointerPressed"/>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Panel lateral -->
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,*"
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
+
+            <!-- Columnas Excel -->
+            <StackPanel Grid.Row="0" Padding="12">
+                <TextBlock Text="Columnas Excel" Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                <TextBlock x:Name="NoExcelText" Text="Carga un Excel para ver las columnas"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                <ListView x:Name="ColumnsList" SelectionMode="Single" MaxHeight="200"
+                          Visibility="Collapsed">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button x:Name="AddFieldButton" Content="➕ Insertar campo seleccionado"
+                        Click="AddFieldButton_Click" IsEnabled="False"
+                        HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+            </StackPanel>
+
+            <Border Grid.Row="0" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" VerticalAlignment="Bottom"/>
+
+            <!-- Campos colocados -->
+            <StackPanel Grid.Row="1" Padding="12">
+                <TextBlock Text="Campos en la plantilla" Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,8,0,8"/>
+                <ListView x:Name="PlacedFieldsList" SelectionChanged="PlacedFieldsList_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ColumnName}" TextWrapping="Wrap"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button x:Name="RemoveFieldButton" Content="🗑 Eliminar campo seleccionado"
+                        Click="RemoveFieldButton_Click" IsEnabled="False"
+                        HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Barra de estado inferior -->
+        <Border Grid.Row="2" Grid.ColumnSpan="2" Padding="16,8"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock x:Name="StatusText" Text="Carga un Excel y haz clic en el PDF para colocar campos"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <TextBlock x:Name="PreviewRowText" Text=""
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Page>
