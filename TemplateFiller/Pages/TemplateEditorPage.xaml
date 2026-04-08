@@ -21,15 +21,8 @@
                 </StackPanel>
             </Button>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock x:Name="TemplateNameText" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                <Button x:Name="LoadExcelButton" Click="LoadExcelButton_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <FontIcon Glyph="&#xE8A5;" FontSize="14"/>
-                        <TextBlock Text="Cargar Excel"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+            <TextBlock Grid.Column="1" x:Name="TemplateNameText" Style="{StaticResource SubtitleTextBlockStyle}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
             <Button Grid.Column="2" x:Name="SaveButton" Click="SaveButton_Click" Style="{StaticResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -39,33 +32,93 @@
             </Button>
         </Grid>
 
-        <!-- Editor de PDF -->
+        <!-- Editor de PDF  (toolbar zoom + scroll) -->
         <Grid Grid.Row="1" Grid.Column="0" x:Name="PdfEditorContainer"
+              RowDefinitions="Auto,*"
               Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+
+            <!-- Toolbar de zoom -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="4" Padding="10,6"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1">
+                <Button x:Name="ZoomOutButton" Click="ZoomOutButton_Click" Width="32" Height="32"
+                        ToolTipService.ToolTip="Reducir zoom">
+                    <FontIcon Glyph="&#xE949;" FontSize="13"/>
+                </Button>
+                <TextBlock x:Name="ZoomLevelText" Text="150%" Width="42"
+                           VerticalAlignment="Center" TextAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"/>
+                <Button x:Name="ZoomInButton" Click="ZoomInButton_Click" Width="32" Height="32"
+                        ToolTipService.ToolTip="Aumentar zoom">
+                    <FontIcon Glyph="&#xE948;" FontSize="13"/>
+                </Button>
+                <Border Width="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="4,4"/>
+                <Button x:Name="ZoomFitButton" Click="ZoomFitButton_Click" Height="32"
+                        ToolTipService.ToolTip="Ajustar al ancho">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <FontIcon Glyph="&#xE9A6;" FontSize="13"/>
+                        <TextBlock Text="Ajustar" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="Zoom100Button" Click="Zoom100Button_Click" Height="32"
+                        ToolTipService.ToolTip="Zoom 100%">
+                    <TextBlock Text="100%"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Área desplazable del PDF -->
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="PdfCanvasContainer" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <!-- Imagen del PDF -->
                     <Image x:Name="PdfImage" Stretch="None"/>
-                    <!-- Canvas con los campos posicionables -->
-                    <Canvas x:Name="FieldsCanvas"
-                            PointerPressed="FieldsCanvas_PointerPressed"/>
+                    <Canvas x:Name="FieldsCanvas" PointerPressed="FieldsCanvas_PointerPressed"/>
                 </Grid>
             </ScrollViewer>
         </Grid>
 
-        <!-- Panel lateral -->
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,*"
+        <!-- Panel lateral  (3 filas: Excel | separador | Campos colocados) -->
+        <Grid Grid.Row="1" Grid.Column="1"
+              RowDefinitions="Auto,Auto,*"
               Background="{ThemeResource LayerFillColorDefaultBrush}"
-              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
+              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+              BorderThickness="1,0,0,0">
 
-            <!-- Columnas Excel -->
-            <StackPanel Grid.Row="0" Padding="12">
-                <TextBlock Text="Columnas Excel" Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
-                <TextBlock x:Name="NoExcelText" Text="Carga un Excel para ver las columnas"
+            <!-- ── Fila 0: sección Excel + columnas ─────────────────────── -->
+            <StackPanel Grid.Row="0" Padding="12,12,12,12" Spacing="8">
+
+                <TextBlock Text="EXCEL" Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                <Button x:Name="LoadExcelButton" Click="LoadExcelButton_Click"
+                        HorizontalAlignment="Stretch"
+                        Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE8A5;" FontSize="14"/>
+                        <TextBlock Text="Cargar Excel (.xlsx)"/>
+                    </StackPanel>
+                </Button>
+
+                <TextBlock x:Name="ExcelFileNameText"
+                           Text="Ningún archivo cargado"
                            Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
-                <ListView x:Name="ColumnsList" SelectionMode="Single" MaxHeight="200"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                           TextTrimming="CharacterEllipsis"/>
+
+                <TextBlock Text="COLUMNAS" Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Margin="0,4,0,0"/>
+
+                <TextBlock x:Name="NoExcelText"
+                           Text="Carga un Excel para ver las columnas aquí"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                           TextWrapping="Wrap"/>
+
+                <ListView x:Name="ColumnsList"
+                          SelectionMode="Single"
+                          MaxHeight="200"
                           Visibility="Collapsed">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -73,28 +126,65 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Button x:Name="AddFieldButton" Content="➕ Insertar campo seleccionado"
-                        Click="AddFieldButton_Click" IsEnabled="False"
-                        HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+
+                <Button x:Name="AddFieldButton"
+                        Content="➕ Insertar campo seleccionado"
+                        Click="AddFieldButton_Click"
+                        IsEnabled="False"
+                        HorizontalAlignment="Stretch"/>
             </StackPanel>
 
-            <Border Grid.Row="0" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" VerticalAlignment="Bottom"/>
+            <!-- ── Fila 1: separador ────────────────────────────────────── -->
+            <Border Grid.Row="1" Height="1"
+                    Background="{ThemeResource DividerStrokeColorDefaultBrush}"/>
 
-            <!-- Campos colocados -->
-            <StackPanel Grid.Row="1" Padding="12">
-                <TextBlock Text="Campos en la plantilla" Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,8,0,8"/>
-                <ListView x:Name="PlacedFieldsList" SelectionChanged="PlacedFieldsList_SelectionChanged">
+            <!-- ── Fila 2: campos colocados + propiedades ───────────────── -->
+            <Grid Grid.Row="2" RowDefinitions="Auto,*,Auto,Auto" Padding="12,8,12,12">
+
+                <TextBlock Grid.Row="0"
+                           Text="CAMPOS EN LA PLANTILLA"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Margin="0,0,0,6"/>
+
+                <ListView Grid.Row="1"
+                          x:Name="PlacedFieldsList"
+                          SelectionChanged="PlacedFieldsList_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding ColumnName}" TextWrapping="Wrap"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Button x:Name="RemoveFieldButton" Content="🗑 Eliminar campo seleccionado"
-                        Click="RemoveFieldButton_Click" IsEnabled="False"
-                        HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
-            </StackPanel>
+
+                <!-- Panel de propiedades del campo seleccionado -->
+                <StackPanel Grid.Row="2" x:Name="FieldPropsPanel"
+                            Visibility="Collapsed" Spacing="6" Margin="0,10,0,0">
+                    <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+                    <TextBlock Text="PROPIEDADES" Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                        <TextBlock Grid.Column="0" Text="Tamaño de fuente"
+                                   VerticalAlignment="Center"
+                                   Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <NumberBox Grid.Column="1"
+                                   x:Name="FontSizeBox"
+                                   Minimum="6" Maximum="120"
+                                   SmallChange="1" LargeChange="4"
+                                   Value="12" Width="85"
+                                   SpinButtonPlacementMode="Inline"
+                                   ValueChanged="FontSizeBox_ValueChanged"/>
+                    </Grid>
+                </StackPanel>
+
+                <Button Grid.Row="3"
+                        x:Name="RemoveFieldButton"
+                        Content="🗑 Eliminar campo seleccionado"
+                        Click="RemoveFieldButton_Click"
+                        IsEnabled="False"
+                        HorizontalAlignment="Stretch"
+                        Margin="0,8,0,0"/>
+            </Grid>
         </Grid>
 
         <!-- Barra de estado inferior -->

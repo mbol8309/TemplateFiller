@@ -8,6 +8,10 @@ public class TemplateConfig
     public string Name { get; set; } = "";
     public int Version { get; set; } = 1;
     public List<FieldMapping> Fields { get; set; } = new();
+    /// <summary>Cabeceras Excel guardadas para preview sin Excel cargado.</summary>
+    public List<string> Columns { get; set; } = new();
+    /// <summary>Primeras filas de ejemplo (máx 3) para preview en el editor.</summary>
+    public List<List<string>> SampleRows { get; set; } = new();
 }
 
 public class FieldMapping

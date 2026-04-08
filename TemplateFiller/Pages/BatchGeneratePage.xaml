@@ -3,10 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="32">
+    <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="24,16,24,12"
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+              BorderThickness="0,0,0,1">
             <Button Grid.Column="0" x:Name="BackButton" Click="BackButton_Click"
                     Style="{StaticResource SubtleButtonStyle}" Margin="0,0,16,0">
                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -16,61 +19,146 @@
             </Button>
             <StackPanel Grid.Column="1">
                 <TextBlock x:Name="TemplateNameText" Style="{StaticResource TitleTextBlockStyle}"/>
-                <TextBlock Text="Generar lote de PDFs" Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            </StackPanel>
-        </Grid>
-
-        <!-- Contenido -->
-        <StackPanel Grid.Row="1" Spacing="16" MaxWidth="600" HorizontalAlignment="Left">
-
-            <!-- Seleccionar Excel -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="1. Selecciona el Excel con los datos" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                    <TextBox Grid.Column="0" x:Name="ExcelPathBox" PlaceholderText="Ruta del archivo Excel..."
-                             IsReadOnly="True"/>
-                    <Button Grid.Column="1" x:Name="BrowseExcelButton" Content="Examinar..."
-                            Click="BrowseExcelButton_Click"/>
-                </Grid>
-                <TextBlock x:Name="ExcelInfoText" Text="" Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            </StackPanel>
-
-            <!-- Carpeta de salida -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="2. Carpeta de destino" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                    <TextBox Grid.Column="0" x:Name="OutputFolderBox" PlaceholderText="Carpeta donde se guardarán los PDFs..."
-                             IsReadOnly="True"/>
-                    <Button Grid.Column="1" x:Name="BrowseOutputButton" Content="Examinar..."
-                            Click="BrowseOutputButton_Click"/>
-                </Grid>
-            </StackPanel>
-
-            <!-- Patrón de nombre de archivo -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="3. Nombre de archivo (opcional)" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                <TextBox x:Name="FilePatternBox" Text="documento_{row}"
-                         Header="Usa {row} para el número de fila"/>
-                <TextBlock Text="Ejemplo: contrato_{row} → contrato_1.pdf, contrato_2.pdf..."
+                <TextBlock Text="Generar lote de PDFs"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             </StackPanel>
+        </Grid>
 
-            <!-- Progreso -->
-            <ProgressBar x:Name="GenerateProgress" Visibility="Collapsed" IsIndeterminate="False"/>
-            <TextBlock x:Name="ProgressText" Text="" Style="{StaticResource CaptionTextBlockStyle}"/>
+        <!-- Contenido scrollable -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="24" Padding="24,20,24,24" MaxWidth="640" HorizontalAlignment="Left">
 
-        </StackPanel>
+                <!-- ── 1. Excel ─────────────────────────────────────────── -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="1. Archivo Excel con los datos"
+                               Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0" x:Name="ExcelPathBox"
+                                 PlaceholderText="Ruta del archivo Excel..."
+                                 IsReadOnly="True"/>
+                        <Button Grid.Column="1" Content="Examinar..."
+                                Click="BrowseExcelButton_Click"/>
+                    </Grid>
+                    <TextBlock x:Name="ExcelInfoText" Text=""
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+
+                <!-- ── 2. Carpeta de salida ─────────────────────────────── -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="2. Carpeta de destino"
+                               Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0" x:Name="OutputFolderBox"
+                                 PlaceholderText="Carpeta donde se guardarán los PDFs..."
+                                 IsReadOnly="True"/>
+                        <Button Grid.Column="1" Content="Examinar..."
+                                Click="BrowseOutputButton_Click"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- ── 3. Filas a procesar ──────────────────────────────── -->
+                <StackPanel Spacing="10">
+                    <TextBlock Text="3. Filas a procesar"
+                               Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+                    <RadioButton x:Name="AllRowsRadio" Content="Todas las filas"
+                                 GroupName="RowMode" IsChecked="True"
+                                 Checked="RowMode_Changed"/>
+                    <RadioButton x:Name="RangeRowsRadio" Content="Rango específico (inicio – fin)"
+                                 GroupName="RowMode" Checked="RowMode_Changed"/>
+                    <RadioButton x:Name="FirstNRowsRadio" Content="Primeras N filas"
+                                 GroupName="RowMode" Checked="RowMode_Changed"/>
+
+                    <!-- Panel rango -->
+                    <StackPanel x:Name="RangePanel" Visibility="Collapsed"
+                                Orientation="Horizontal" Spacing="16" Margin="20,0,0,0">
+                        <NumberBox x:Name="RangeStartBox" Header="Desde fila"
+                                   Minimum="1" Value="1" Width="130"
+                                   SpinButtonPlacementMode="Inline"
+                                   ValueChanged="RowRange_ValueChanged"/>
+                        <NumberBox x:Name="RangeEndBox" Header="Hasta fila"
+                                   Minimum="1" Value="10" Width="130"
+                                   SpinButtonPlacementMode="Inline"
+                                   ValueChanged="RowRange_ValueChanged"/>
+                    </StackPanel>
+
+                    <!-- Panel cantidad -->
+                    <StackPanel x:Name="CountPanel" Visibility="Collapsed"
+                                Margin="20,0,0,0">
+                        <NumberBox x:Name="RowCountBox" Header="Número de filas"
+                                   Minimum="1" Value="10" Width="130"
+                                   SpinButtonPlacementMode="Inline"
+                                   ValueChanged="RowRange_ValueChanged"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="RowSelectionInfoText" Text=""
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+
+                <!-- ── 4. Nombre de archivo ─────────────────────────────── -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="4. Nombre de los archivos generados"
+                               Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+                    <TextBox x:Name="FilePatternBox" Text="documento_{row}"
+                             PlaceholderText="Patrón del nombre..."
+                             TextChanged="FilePatternBox_TextChanged"/>
+
+                    <!-- Chips de columnas Excel -->
+                    <StackPanel x:Name="ColumnChipsPanel" Visibility="Collapsed" Spacing="6">
+                        <TextBlock Text="Insertar campo del Excel en el nombre:"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="ColumnChipsContainer"
+                                        Orientation="Horizontal" Spacing="6"/>
+                        </ScrollViewer>
+                    </StackPanel>
+
+                    <!-- Vista previa del nombre -->
+                    <TextBlock x:Name="FileNamePreviewText" Text=""
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Usa {row} para el número de fila, o cualquier campo del Excel."
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                </StackPanel>
+
+                <!-- ── Progreso ──────────────────────────────────────────── -->
+                <StackPanel Spacing="6">
+                    <ProgressBar x:Name="GenerateProgress"
+                                 Visibility="Collapsed"
+                                 IsIndeterminate="False"/>
+                    <TextBlock x:Name="ProgressText" Text=""
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
 
         <!-- Botón generar -->
-        <Grid Grid.Row="2" Margin="0,24,0,0">
-            <Button x:Name="GenerateButton" Content="⚡ Generar PDFs"
+        <Border Grid.Row="2" Padding="24,12"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0">
+            <Button x:Name="GenerateButton"
                     Style="{StaticResource AccentButtonStyle}"
-                    Click="GenerateButton_Click" IsEnabled="False"
-                    HorizontalAlignment="Left" Padding="24,10"/>
-        </Grid>
+                    Click="GenerateButton_Click"
+                    IsEnabled="False"
+                    Padding="24,10">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE9F5;" FontSize="14"/>
+                    <TextBlock x:Name="GenerateButtonText" Text="Generar PDFs"/>
+                </StackPanel>
+            </Button>
+        </Border>
 
     </Grid>
 </Page>
